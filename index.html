@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>Case Register System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    </head>
+  <body>
+    <!-- Global Loader -->
+    <div id="globalLoader" class="loading hidden">
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <svg width="48" height="48" viewBox="0 0 50 50">
+          <circle
+            cx="25"
+            cy="25"
+            r="20"
+            fill="none"
+            stroke="#3b82f6"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-dasharray="90,150"
+            stroke-dashoffset="0"
+          >
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 25 25"
+              to="360 25 25"
+              dur="1s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </svg>
+        <div
+          style="
+            margin-top: 20px;
+            color: #3b82f6;
+            font-size: 20px;
+            font-weight: 500;
+          "
+        >
+          Loading, please wait...
+        </div>
+      </div>
+    </div>
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+      <div class="login-card">
+        <h1 class="login-title">ZEHSSCWU <br>Case Register</h1>
+
+        <form id="signinForm">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="email" id="signinEmail" class="form-input" placeholder="Enter your assigned email address" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input
+              type="password"
+              id="signinPassword"
+              class="form-input"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Sign In
+          </button>
+        </form>
+
+        <div id="authError" class="error hidden"></div>
+      </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+      <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+          <div class="logo">
+            <h2>Case Register</h2>
+          </div>
+
+          <ul class="nav-menu" id="navMenu">
+            <!-- Navigation items will be populated based on role -->
+          </ul>
+
+          <div class="user-section">
+            <div class="user-info">
+              <div class="user-avatar" id="sidebarAvatar"></div>
+              <div class="user-details">
+                <h4 id="sidebarUserName">Loading...</h4>
+                <small id="sidebarUserRole">Loading...</small>
+              </div>
+            </div>
+            <button onclick="signOut()" class="logout-btn">Sign Out</button>
+          </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+          <!-- Dashboard Tab -->
+          <div id="dashboardTab" class="tab-content">
+            <div class="page-header">
+              <h1 class="page-title">Dashboard</h1>
+              <p class="page-subtitle">
+                Welcome back! Here's what's happening with your cases.
+              </p>
+            </div>
+
+            <div class="dashboard-grid" id="dashboardContent">
+              <!-- Dashboard content will be populated based on role -->
+            </div>
+
+            <!-- Recent Cases Table (for officers) -->
+            <div id="recentCasesTable" class="hidden">
+              <div class="table-container">
+                <div class="table-header">
+                  <h3 class="table-title">Active Cases</h3>
+                </div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Case Number</th>
+                        <th>Date</th>
+                        <th>Complainant Address</th>
+                        <th>Respondent's Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentCasesBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Officer Profiles (for admin) -->
+            <div id="officerProfilesTable" class="hidden">
+              <div class="table-container">
+                <div class="table-header">
+                  <h3 class="table-title">Officer Profiles</h3>
+                </div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Officer</th>
+                        <th>Role</th>
+                        <th>Region</th>
+                        <th>Active Cases</th>
+                        <th>Concluded Cases</th>
+                        <th>Total Cases</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="officerProfilesBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Tab -->
+          <div id="searchTab" class="tab-content hidden">
+            <div class="page-header">
+              <h1 class="page-title">Search Cases</h1>
+              <p class="page-subtitle">
+                Find and manage cases using advanced filters.
+              </p>
+            </div>
+
+            <div class="search-container">
+              <div class="search-grid">
+                <div class="form-group">
+                  <label class="form-label">Date From</label>
+                  <input type="date" id="searchDateFrom" class="form-input" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Date To</label>
+                  <input type="date" id="searchDateTo" class="form-input" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nature of Case</label>
+                  <input
+                    type="text"
+                    id="searchNature"
+                    class="form-input"
+                    placeholder="Search by nature..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Complainant Address</label>
+                  <input
+                    type="text"
+                    id="searchComplainant"
+                    class="form-input"
+                    placeholder="Search complainant..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Respondent's Address</label>
+                  <input
+                    type="text"
+                    id="searchRespondent"
+                    class="form-input"
+                    placeholder="Search respondent..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <select id="searchStatus" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="concluded">Concluded</option>
+                  </select>
+                </div>
+              </div>
+              <button onclick="performSearch()" class="btn btn-primary">
+                Search Cases
+              </button>
+              <button onclick="clearSearch()" class="btn btn-secondary">
+                Clear Filters
+              </button>
+            </div>
+
+            <div id="searchResults" class="table-container hidden">
+              <div class="table-header">
+                <h3 class="table-title">Search Results</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Case Number</th>
+                      <th>Date Reported</th>
+                      <th>Nature of Complaint</th>
+                      <th>Status</th>
+                      <th>Officer</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="searchResultsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Case Tab -->
+          <div id="addCaseTab" class="tab-content hidden">
+            <div class="page-header">
+              <h1 class="page-title">Add New Case</h1>
+              <p class="page-subtitle">Register a new case in the system.</p>
+            </div>
+
+            <div class="form-container">
+              <form id="addCaseForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Case Number *</label>
+                    <input
+                      type="text"
+                      id="caseNumber"
+                      class="form-input"
+                      required
+                      placeholder="Enter court-provided case number"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Date Reported *</label>
+                    <input
+                      type="date"
+                      id="dateReported"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Complainant Address</label>
+                    <input
+                      type="text"
+                      id="complainantAddress"
+                      class="form-input"
+                      placeholder="Enter the complainant's address"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Respondent's Address</label>
+                    <input
+                      type="text"
+                      id="respondentAddress"
+                      class="form-input"
+                      placeholder="Enter the respondent's address"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label"
+                    >Nature & Details of Complaint *</label
+                  >
+                  <textarea
+                    id="natureAndDetails"
+                    class="form-textarea"
+                    required
+                    placeholder="Describe the nature and details of the complaint"
+                  ></textarea>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Membership Status</label>
+                    <select id="membershipStatus" class="form-select">
+                      <option value="unknown">Unknown</option>
+                      <option value="member">Member</option>
+                      <option value="non_member">Members</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Officer Handling Case</label>
+                    <select id="officerHandling" class="form-select">
+                      <option value="">Select Officer</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label"
+                    >Action Taken To Redress Matter</label
+                  >
+                  <textarea
+                    id="actionTaken"
+                    class="form-textarea"
+                    placeholder="Describe actions taken to address the matter"
+                  ></textarea>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Date When Case Concluded</label>
+                    <input type="date" id="dateConcluded" class="form-input" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="caseStatus" class="form-select">
+                      <option value="open">Open</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="concluded">Concluded</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Comments</label>
+                  <textarea
+                    id="comments"
+                    class="form-textarea"
+                    placeholder="Additional comments or notes"
+                  ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Case</button>
+              </form>
+
+              <div id="addCaseError" class="error hidden"></div>
+              <div id="addCaseSuccess" class="success hidden"></div>
+            </div>
+          </div>
+
+          <!-- Update Profile Tab -->
+          <div id="updateProfileTab" class="tab-content hidden">
+            <div class="page-header">
+              <h1 class="page-title">Update Profile</h1>
+              <p class="page-subtitle">
+                Update your personal information and contact details.
+              </p>
+            </div>
+
+            <div class="form-container">
+              <form id="updateProfileForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      id="updateFullName"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input
+                      type="email"
+                      id="updateEmail"
+                      class="form-input"
+                      required
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Region</label>
+                    <input
+                      type="text"
+                      id="updateRegion"
+                      class="form-input"
+                      placeholder="Enter your region"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input
+                      type="tel"
+                      id="updatePhone"
+                      class="form-input"
+                      placeholder="Enter phone number"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">WhatsApp Contact</label>
+                  <input
+                    type="tel"
+                    id="updateWhatsApp"
+                    class="form-input"
+                    placeholder="Enter WhatsApp number"
+                  />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  Update Profile
+                </button>
+              </form>
+
+              <div id="updateProfileError" class="error hidden"></div>
+              <div id="updateProfileSuccess" class="success hidden"></div>
+            </div>
+          </div>
+
+          <!-- Cases Tab -->
+          <div id="casesTab" class="tab-content hidden">
+            <div class="page-header">
+              <h1 class="page-title">All Cases</h1>
+              <p class="page-subtitle">View and manage all your cases.</p>
+            </div>
+
+            <div class="search-container">
+              <div class="search-grid">
+                <div class="form-group">
+                  <label class="form-label">Filter by Year</label>
+                  <select id="filterYear" class="form-select">
+                    <option value="">All Years</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Filter by Respondent</label>
+                  <input
+                    type="text"
+                    id="filterRespondent"
+                    class="form-input"
+                    placeholder="Search respondent..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Filter by Nature</label>
+                  <input
+                    type="text"
+                    id="filterNature"
+                    class="form-input"
+                    placeholder="Search nature..."
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Filter by Status</label>
+                  <select id="filterStatus" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="concluded">Concluded</option>
+                  </select>
+                </div>
+              </div>
+              <button onclick="filterCases()" class="btn btn-primary">
+                Apply Filters
+              </button>
+              <button onclick="clearCaseFilters()" class="btn btn-secondary">
+                Clear Filters
+              </button>
+            </div>
+
+            <div class="table-container">
+              <div class="table-header">
+                <h3 class="table-title">Cases</h3>
+              </div>
+              <div id="casesLoading" class="loading">Loading cases...</div>
+              <div id="casesContainer" class="hidden">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Case Number</th>
+                        <th>Date</th>
+                        <th>Complainant Address</th>
+                        <th>Respondent Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="casesTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Case Details Modal -->
+    <div id="caseModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Case Details</h2>
+          <span class="close" onclick="closeCaseModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="editCaseForm">
+            <div id="caseDetailsContent">
+              <!-- Case details will be populated here -->
+            </div>
+            <div style="margin-top: 24px; display: flex; gap: 12px">
+              <button type="submit" class="btn btn-primary">Update Case</button>
+              <button
+                type="button"
+                onclick="deleteCaseConfirm()"
+                class="btn btn-danger"
+              >
+                Delete Case
+              </button>
+              <button
+                type="button"
+                onclick="closeCaseModal()"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+          <div id="modalError" class="error hidden"></div>
+          <div id="modalSuccess" class="success hidden"></div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>       
+</html>
