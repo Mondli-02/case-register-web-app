@@ -6,8 +6,8 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <title>Case Register System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
-    </head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
   <body>
     <!-- Global Loader -->
     <div id="globalLoader" class="loading hidden">
@@ -51,12 +51,18 @@
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
       <div class="login-card">
-        <h1 class="login-title">ZEHSSCWU <br>Case Register</h1>
+        <h1 class="login-title">ZEHSSCWU <br />Case Register</h1>
 
         <form id="signinForm">
           <div class="form-group">
             <label class="form-label">Username</label>
-            <input type="email" id="signinEmail" class="form-input" placeholder="Enter your assigned email address" required />
+            <input
+              type="email"
+              id="signinEmail"
+              class="form-input"
+              placeholder="Enter your assigned email address"
+              required
+            />
           </div>
           <div class="form-group">
             <label class="form-label">Password</label>
@@ -523,6 +529,31 @@
                     <tbody id="casesTableBody"></tbody>
                   </table>
                 </div>
+                <div
+                  class="pagination-controls"
+                  style="
+                    margin-top: 12px;
+                    display: flex;
+                    justify-content: center;
+                    gap: 8px;
+                  "
+                >
+                  <button
+                    id="prevPageBtn"
+                    class="btn btn-secondary btn-sm"
+                    onclick="prevPage()"
+                  >
+                    Previous
+                  </button>
+                  <span id="paginationInfo">Page 1</span>
+                  <button
+                    id="nextPageBtn"
+                    class="btn btn-secondary btn-sm"
+                    onclick="nextPage()"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -566,5 +597,5 @@
       </div>
     </div>
     <script src="script.js"></script>
-  </body>       
+  </body>
 </html>
