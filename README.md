@@ -1,35 +1,43 @@
-# Case Register Web App
+# 📂 Case Register System  
 
-A web application for managing and tracking case registrations, built using JavaScript, HTML, and CSS.
+A **web-based case management system** built with **HTML, CSS, JavaScript, and Supabase**.  
+Designed for administrators and officers to **record, track, search, and manage cases** efficiently with role-based dashboards.  
 
-## Overview
+---
 
-The **Case Register Web App** is designed to help organizations or individuals efficiently register, organize, and monitor cases. It provides an intuitive interface for creating, viewing, updating, and searching case records, making case management simple and accessible.
+## 🚀 Features
+- **User Authentication** (Supabase Auth)
+- **Role-based dashboards**  
+  - Admin → view officer stats & system-wide cases  
+  - Officer → manage personal assigned cases  
+- **Case Management**  
+  - Add, edit, delete, and view detailed case records  
+  - Attach officer handling information  
+  - Track status: `Open`, `In Progress`, `Concluded`
+- **Search & Filtering**  
+  - By date, complainant, respondent, case nature, or status  
+- **Pagination for Cases** (efficient loading of large datasets)
+- **Officer Statistics** (total, active, and concluded cases per officer)
+- **Profile Management** (officers can update contact info and region)
+- **Responsive UI** (mobile-friendly with sidebar toggle)
+- **Optimistic Updates** for instant UI refresh after edits or deletions  
 
-## Features
+---
 
-- **Case Registration**: Add new cases with relevant details.
-- **Case Search & Filter**: Easily find cases using robust search and filtering options.
-- **Case Updates**: Edit and update case information as needed.
-- **Responsive Design**: Works seamlessly on desktops, tablets, and mobile devices.
-- **User-Friendly Interface**: Simple, intuitive navigation and layout.
+## 🛠️ Tech Stack
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript  
+- **Backend / Database:** Supabase (PostgreSQL + Auth + Storage)  
+- **Auth:** Supabase Authentication  
+- **Data Fetching:** Supabase JS Client  
 
-## Technology Stack
+---
 
-- **JavaScript** (54.7%)
-- **HTML** (25.7%)
-- **CSS** (19.6%)
+## 📊 Future Improvements
+- Infinite scroll for cases
+- Role-based permissions on database level (RLS in Supabase)
+- Full-text search with Postgres **GIN indexes**
+- Case attachments (file upload via Supabase Storage)  
 
-## Getting Started
+---
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (if using build tools or package managers)
-- Modern web browser
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Mondli-02/case-register-web-app.git
-   cd case-register-web-app
+## Built with ❤️ by Mondli
